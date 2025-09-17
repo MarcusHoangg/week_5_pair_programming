@@ -16,40 +16,37 @@ const AddJobPage = () => {
 
   const submitForm = async (e) => {
     e.preventDefault();
-
-    // Optional: basic validation
-    if (!title || !description || !companyName || !contactEmail) {
-      alert("Please fill in all required fields.");
-      return;
-    }
-
     setSaving(true);
+
     try {
       const payload = {
         title,
         type,
         description,
-        companyName,
-        contactEmail,
-        contactPhone,
+        company: {
+          name: companyName,
+          contactEmail,
+          contactPhone,
+        },
         location,
         salary: Number(salary),
       };
 
-      const response = await fetch("http://localhost:3000/jobs", {
+      const res = await fetch("http://localhost:4000/api/jobs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to add job");
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(txt || "Create job failed");
       }
 
       navigate("/");
-    } catch (error) {
-      alert(error.message);
-      console.error("Error adding job:", error);
+    } catch (err) {
+      alert(err.message);
+      console.error(err);
     } finally {
       setSaving(false);
     }
@@ -73,6 +70,7 @@ const AddJobPage = () => {
           id="type"
           value={type}
           onChange={(e) => setType(e.target.value)}
+          required
         >
           <option value="Full-Time">Full-Time</option>
           <option value="Part-Time">Part-Time</option>
@@ -85,7 +83,7 @@ const AddJobPage = () => {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           required
-        ></textarea>
+        />
 
         <label htmlFor="companyName">Company Name:</label>
         <input
@@ -111,6 +109,7 @@ const AddJobPage = () => {
           type="tel"
           value={contactPhone}
           onChange={(e) => setContactPhone(e.target.value)}
+          required
         />
 
         <label htmlFor="location">Location:</label>
@@ -119,6 +118,7 @@ const AddJobPage = () => {
           type="text"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
+          required
         />
 
         <label htmlFor="salary">Salary:</label>
@@ -127,6 +127,7 @@ const AddJobPage = () => {
           type="number"
           value={salary}
           onChange={(e) => setSalary(e.target.value)}
+          required
         />
 
         <button type="submit" disabled={saving}>

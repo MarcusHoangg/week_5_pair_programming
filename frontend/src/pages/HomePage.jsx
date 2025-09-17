@@ -1,33 +1,39 @@
-import JobListing from "../components/JobListing";
 import { useEffect, useState } from "react";
+import JobListing from "../components/JobListing";
 
 const Home = () => {
   const [jobs, setJobs] = useState([]);
-  const[loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
+
     const fetchJobs = async () => {
       try {
-        const response = await fetch("http://localhost:4000/jobs");
-        const data = await response.json();
+        const res = await fetch("http://localhost:4000/api/jobs");
+        const data = await res.json();
         setJobs(data);
-      } catch (error) {
-        console.error("Error fetching jobs:", error);
+      } catch (err) {
+        console.error("Error fetching jobs:", err);
       } finally {
         setLoading(false);
       }
     };
+
     fetchJobs();
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <p>Loading...</p>;
   }
+
   return (
     <div className="home">
       <div className="job-list">
-        {jobs.length === 0 && <p>No jobs found</p>}
-        {jobs.length !== 0 &&
-          jobs.map((job) => <JobListing key={job.id} {...job} />)}
+        {jobs.length === 0 ? (
+          <p>No jobs found</p>
+        ) : (
+          jobs.map((job) => <JobListing key={job._id} {...job} />)
+        )}
       </div>
     </div>
   );
