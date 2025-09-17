@@ -7,7 +7,7 @@ const Home = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await fetch("http://localhost:3000/jobs");
+        const response = await fetch("http://localhost:4000/jobs");
         const data = await response.json();
         setJobs(data);
       } catch (error) {
