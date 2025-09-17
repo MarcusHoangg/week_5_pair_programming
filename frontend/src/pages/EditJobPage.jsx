@@ -13,6 +13,8 @@ const EditJobPage = () => {
   const [contactPhone, setContactPhone] = useState("");
   const [location, setLocation] = useState("");
   const [salary, setSalary] = useState("");
+  const [loading, setLoading] = useState("false");
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchJob = async () => {
@@ -37,18 +39,54 @@ const EditJobPage = () => {
         setSalary(data.salary);
       } catch (error) {
         console.log("Error fetching data", error);
+        setError("Error fetching data");
       }
     };
     fetchJob();
   }, [id]);
 
-  const submitForm = (e) => {
+  const submitForm = async (e) => {
     e.preventDefault();
-    console.log("EditJobPage");
+    setLoading(true);
+    setError(null);
+
+    try {
+      const updateJob = {
+        title,
+        type,
+        location,
+        description,
+        salary: Number(salary),
+        company: {
+          name: companyName,
+          contactEmail,
+          contactPhone
+        },
+      };
+
+      const response = await fetch(`/api/jobs/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updateJob),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to update job: ${response.status}`);
+      }
+      navigate("/");
+    } catch (err) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+
   };
 
   const cancelEdit = () => {
-    console.log("cancelEdit");
+    // console.log("cancelEdit");
+    navigate(`/jobs/${id}`);
   };
 
   return (
